@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>High‑Altitude BioDigester — Modern UI</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-1: #e9f7ef; --bg-2:#f3fbf4; --card:#ffffffaa; --glass:#ffffff22; --accent:#2e7d32; --muted:#51615a;
+  --glass-blur: 10px; --glass-border: rgba(255,255,255,0.25);
+  --radius:16px; --maxw:1100px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Arial;color:#082; background:linear-gradient(180deg,var(--bg-1),var(--bg-2));}
+.container{max-width:var(--maxw);margin:28px auto;padding:20px;display:grid;grid-template-columns:1fr 420px;gap:22px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.5));border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(6,20,10,0.06);backdrop-filter: blur(var(--glass-blur));border:1px solid var(--glass-border);}
+.header{display:flex;gap:12px;align-items:center}
+.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#60ad5b);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:0 6px 20px rgba(46,125,50,0.15)}
+.title{margin:0}
+.lead{color:var(--muted);font-size:13px}
+form{margin-top:14px;display:grid;gap:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.input, select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(6,20,10,0.06);background:rgba(255,255,255,0.6);font-size:14px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;color:#134f20}
+.small{font-size:13px;color:var(--muted)}
+.controls{display:flex;gap:10px;align-items:center}
+.btn{padding:10px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),#4caf50);color:#fff;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(46,125,50,0.12)}
+.btn.ghost{background:transparent;border:1px solid rgba(6,20,10,0.06);color:#234}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.15)}
+.layers{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.layer{display:grid;grid-template-columns:1fr 86px 86px 36px;gap:8px;align-items:center;padding:8px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));border:1px solid rgba(0,0,0,0.03);transition:transform .22s ease, box-shadow .22s ease}
+.layer:hover{transform:translateY(-4px);box-shadow:0 8px 22px rgba(6,20,10,0.06)}
+.layer input{padding:8px;border-radius:8px;border:1px solid rgba(6,20,10,0.05)}
+.layer .remove{background:#ef5350;color:#fff;border:none;border-radius:8px;padding:6px;cursor:pointer}
+.panel-right{display:flex;flex-direction:column;gap:12px}
+.results{display:flex;flex-direction:column;gap:10px}
+.stat{padding:12px;border-radius:12px;background:linear-gradient(180deg,#fbfff9,#f0fff0);border:1px solid rgba(46,125,50,0.06);min-height:56px;display:flex;flex-direction:column;justify-content:center}
+.stat h3{margin:0;color:var(--accent);font-size:13px}
+.muted{color:var(--muted)}
+.footer{font-size:12px;color:#51615a;margin-top:6px}
+hr.sep{border:none;border-top:1px solid rgba(6,20,10,0.04);margin:8px 0}
+/* animations */
+.fadeInUp{animation:fadeUp .45s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* modal */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:60}
+.modal.open{display:flex}
+.modal .box{width:92%;max-width:720px;padding:18px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.96),#fff);box-shadow:0 30px 80px rgba(6,20,10,0.12)}
+.modal .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* popover */
+.popover{position:relative;display:inline-flex;align-items:center}
+.info-btn{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;border:none;display:inline-grid;place-items:center;cursor:pointer;font-size:13px}
+.popover-content{position:absolute;left:110%;top:0;background:#0f1724;color:#fff;padding:12px;border-radius:10px;font-size:13px;min-width:240px;display:none;z-index:80;box-shadow:0 12px 40px rgba(0,0,0,0.35);transform-origin:left top;opacity:0;transform:translateY(6px) scale(.98);transition:opacity .18s ease, transform .18s ease}
+.popover.open .popover-content{display:block;opacity:1;transform:none}
+.popover .title{font-weight:700;margin-bottom:6px}
+.popover .example{font-weight:600;color:#cfead4;margin-top:6px;display:block}
+/* small screens */
+@media (max-width:980px){.container{grid-template-columns:1fr;}.panel-right{order:2}.card{margin-bottom:14px}}
+.counter{font-weight:800;color:#123;font-size:18px}
+.info-line{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="container">
+    <main class="card fadeInUp" aria-labelledby="title">
+      <div class="header">
+        <div class="logo">BD</div>
+        <div>
+          <h1 id="title" class="title">High‑Altitude BioDigester — Animated UI</h1>
+          <div class="lead">Iterative solver coupling insulation ↔ internal temperature ↔ HRT. Smooth animations, presets and glassmorphism.</div>
+        </div>
+      </div>
+
+      <form id="mainForm" novalidate>
+        <div class="row">
+          <label for="dailyFeed">Daily Feed <span class="small">(liters/day)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="dailyFeed" class="input" type="number" step="any" placeholder="e.g. 1000" required aria-describedby="dailyFeedInfo">
+              <span class="popover" data-target="dailyFeedInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="dailyFeedInfo">
+                  <div class="title">Daily Feed</div>
+                  Typical feed volume of slurry entering digester per day. Example: <strong>1000 L/day</strong>.
+                  <div class="example">Example value: 1000 L/day</div>
+                </div>
+              </span>
+            </div>
+          </label>
+
+          <label for="baseHRT">Base HRT <span class="small">(days at 30°C)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="baseHRT" class="input" type="number" min="1" step="any" placeholder="e.g. 30" required aria-describedby="baseHRTInfo">
+              <span class="popover" data-target="baseHRTInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="baseHRTInfo">
+                  <div class="title">Base HRT</div>
+                  Design base hydraulic retention time at mesophilic reference (30°C). Example: <strong>30 days</strong>.
+                  <div class="example">Example value: 30 days</div>
+                </div>
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="ambientTemp">Ambient Temperature <span class="small">(°C)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="ambientTemp" class="input" type="number" step="0.1" placeholder="e.g. 5" required aria-describedby="ambientTempInfo">
+              <span class="popover" data-target="ambientTempInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="ambientTempInfo">
+                  <div class="title">Ambient Temperature</div>
+                  Local air temperature at site. Use measured or typical seasonal mean.
+                  <div class="example">Example value: 5 °C</div>
+                </div>
+              </span>
+            </div>
+          </label>
+
+          <label for="altitude">Altitude <span class="small">(m a.s.l.)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="altitude" class="input" type="number" step="1" placeholder="e.g. 2500" required aria-describedby="altInfo">
+              <span class="popover" data-target="altInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="altInfo">
+                  <div class="title">Altitude</div>
+                  Site elevation above sea level. Used to compute local pressure for dome sizing.
+                  <div class="example">Example value: 2500 m</div>
+                </div>
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="ratio">Height-to-Diameter Ratio <span class="small">(1:N)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="ratio" class="input" aria-describedby="ratioInfo"><option value="1">1:1</option><option value="2">1:2</option><option value="3" selected>1:3</option><option value="4">1:4</option><option value="5">1:5</option></select>
+              <span class="popover" data-target="ratioInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="ratioInfo">
+                  <div class="title">Height-to-Diameter Ratio</div>
+                  Geometry ratio (1:N). Affects digester height for a given volume. Common: <strong>1:3</strong>.
+                  <div class="example">Example value: 1:3</div>
+                </div>
+              </span>
+            </div>
+          </label>
+
+          <label for="qgen">Metabolic heat q<sub>gen</sub> <span class="small">(W/m³)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="qgen" class="input" type="number" step="0.1" value="10" aria-describedby="qgenInfo">
+              <span class="popover" data-target="qgenInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="qgenInfo">
+                  <div class="title">Metabolic heat (q<sub>gen</sub>)</div>
+                  Heat produced by microbes per unit slurry volume. Typical range: <strong>5–15 W/m³</strong>.
+                  <div class="example">Default: 10 W/m³</div>
+                </div>
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="q10">Q<sub>10</sub> <span class="small">(unitless)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="q10" class="input" type="number" step="0.1" value="2.0" aria-describedby="q10Info">
+              <span class="popover" data-target="q10Info">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="q10Info">
+                  <div class="title">Q<sub>10</sub></div>
+                  Temperature sensitivity factor: how biological rates change per 10°C. Typical: <strong>2.0</strong>.
+                  <div class="example">Default: 2.0</div>
+                </div>
+              </span>
+            </div>
+          </label>
+
+          <label for="hin">Inner convective h<sub>in</sub> <span class="small">(W/m²K)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="hin" class="input" type="number" step="0.1" value="10" aria-describedby="hinInfo">
+              <span class="popover" data-target="hinInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="hinInfo">
+                  <div class="title">Inner convection (h<sub>in</sub>)</div>
+                  Inner convective heat transfer coefficient (slurry to wall). Example: <strong>8–12 W/m²K</strong>.
+                  <div class="example">Example: 10 W/m²K</div>
+                </div>
+              </span>
+            </div>
+          </label>
+        </div>
+
+        <div class="row">
+          <label for="hout">Outer convective h<sub>out</sub> <span class="small">(W/m²K)</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="hout" class="input" type="number" step="0.1" value="8" aria-describedby="houtInfo">
+              <span class="popover" data-target="houtInfo">
+                <button type="button" class="info-btn" aria-haspopup="true" aria-expanded="false">ℹ</button>
+                <div class="popover-content" role="dialog" aria-hidden="true" id="houtInfo">
+                  <div class="title">Outer convection (h<sub>out</sub>)</div>
+                  Outer convective coefficient for air; wind increases this value. Typical: <strong>5–12 W/m²K</strong>.
+                  <div class="example">Example: 8 W/m²K</div>
+                </div>
+              </span>
+            </div>
+          </label>
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;gap:8px;align-items:center">
+              <button type="button" id="calcBtn" class="btn">Calculate</button>
+              <button type="button" id="resetBtn" class="btn ghost">Reset</button>
+            </div>
+            <div class="pill"><strong id="status">Idle</strong><span class="small" id="statusDetail">Ready</span></div>
+          </div>
+        </div>
+
+        <hr class="sep">
+
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0;color:#234725">Insulation Layers</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button type="button" id="addLayerBtn" class="btn">+ Add layer</button>
+            <button type="button" id="presetBtn" class="btn" style="background:#6b8f6b">Material presets</button>
+            <button type="button" id="clearLayers" class="btn ghost">Clear</button>
+          </div>
+        </div>
+
+        <div class="layers" id="layersList" aria-live="polite"></div>
+
+        <div style="display:flex;gap:10px;margin-top:8px;align-items:center;flex-wrap:wrap">
+          <button type="button" id="savePreset" class="btn ghost">Save preset</button>
+          <button type="button" id="exportBtn" class="btn ghost">Export JSON</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none">
+          <button type="button" id="importBtn" class="btn ghost">Import JSON</button>
+        </div>
+
+        <p class="small muted">Tip: add realistic insulation layers (thickness in m, k in W/m·K). Example presets available. Use export/import to share designs.</p>
+      </form>
+    </main>
+
+    <aside class="card panel-right fadeInUp">
+      <div class="results" id="resultsPanel">
+        <div class="stat"><h3>Adjusted HRT</h3><div class="counter" id="outHRT">—</div><div class="info-line" id="outHRTinfo"></div></div>
+        <div class="stat"><h3>Working Slurry Volume</h3><div class="counter" id="outVol">—</div></div>
+        <div class="stat"><h3>Dimensions (Height × Diameter)</h3><div class="counter" id="outDims">—</div></div>
+        <div class="stat"><h3>Internal Temp (°C)</h3><div class="counter" id="outTint">—</div></div>
+        <div class="stat"><h3>Thermal Resistances</h3><div class="info-line" id="outR">—</div></div>
+        <div class="stat"><h3>Dome Volume (sea / adjusted)</h3><div class="counter" id="outDome">—</div></div>
+        <div class="stat"><h3>Solver Info</h3><div class="info-line" id="outInfo">—</div></div>
+      </div>
+      <div class="footer">Click <em>Material presets</em> to quickly add common layers.</div>
+    </aside>
+  </div>
+
+  <!-- presets modal -->
+  <div class="modal" id="modal" aria-hidden="true">
+    <div class="box" role="dialog" aria-modal="true" aria-labelledby="presetTitle">
+      <h3 id="presetTitle">Material presets</h3>
+      <div class="grid" id="presetGrid"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal" class="btn ghost">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ---------- Configuration / Constants ----------
+const CONFIG = {
+  tref: 30.0,
+  TminRel: 0.05,
+  TmaxRel: 3.0,
+  maxIter: 200,
+  tol: 1e-4,
+  alphaMin: 0.15,
+  alphaMax: 0.9,
+  T_int_limit: {min:-10, max:80},
+  Tref_gas: 293.15 // K (20°C)
+};
+
+// ---------- Utilities ----------
+const el = id => document.getElementById(id);
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function animateValue(id, start, end, suffix='', decimals=2){
+  const node = el(id); let startTime=null; const dur=650; function easing(t){return 1 - Math.pow(1 - t, 3);} function step(ts){ if(!startTime) startTime=ts; const t=(ts-startTime)/dur; const tt=clamp(t,0,1); const eased = easing(tt); const val = start + (end-start)*eased; node.textContent = Number(val).toFixed(decimals)+(suffix?(' '+suffix):''); if(tt<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// pressure altitude (kPa)
+function pressureAtAltitude(alt){ if(!isFinite(alt)) return 101.325; const a = 101.325 * Math.pow(1 - (2.25577e-5 * alt), 5.25588); return a; }
+function hemisphereVolume(r){ return (2/3) * Math.PI * Math.pow(r,3); }
+function cylinderDiameterFromVolume(V, ratio){ return Math.cbrt((4 * V) / (Math.PI * ratio)); }
+
+// improved resistances: compute layer-by-layer radial conduction for lateral and top separately, tracking area growth
+function computeResistances(r0, L, layers, h_in, h_out){
+  // lateral
+  const A_lat_in = 2 * Math.PI * r0 * L;
+  let r_prev = r0; let R_cond_lat = 0;
+  for(const ly of layers){ const t = Number(ly.t)||0; const k = Number(ly.k)||1e9; const r_next = r_prev + t; if(t>0 && k>0) R_cond_lat += Math.log(r_next/r_prev)/(2*Math.PI*k*L); r_prev = r_next; }
+  const r_out = r_prev; const A_lat_out = 2*Math.PI*r_out*L;
+  const R_conv_in_lat = 1/(h_in*A_lat_in); const R_conv_out_lat = 1/(h_out*A_lat_out);
+  const R_lat = R_conv_in_lat + R_cond_lat + R_conv_out_lat;
+
+  // top/bottom: compute conduction per layer using inner area; outer convective uses outer area
+  const A_top_in = Math.PI * r0*r0; let R_cond_top_sum = 0; for(const ly of layers){ const t = Number(ly.t)||0; const k = Number(ly.k)||1e9; if(t>0 && k>0){ R_cond_top_sum += t/(k*A_top_in); } }
+  const A_top_out = Math.PI * r_out*r_out; const R_conv_in_top = 1/(h_in*A_top_in); const R_conv_out_top = 1/(h_out*A_top_out);
+  const R_top = R_conv_in_top + R_cond_top_sum + R_conv_out_top;
+  const R_bottom = R_top;
+
+  // combine in parallel (lat + top + bottom)
+  const G_lat = 1/R_lat; const G_top=1/R_top; const G_bottom=1/R_bottom; const G_total = G_lat+G_top+G_bottom; const R_global = 1/G_total;
+  return {R_lat,R_top,R_bottom,R_global,components:{R_conv_in_lat,R_cond_lat,R_conv_out_lat,R_conv_in_top,R_cond_top_sum,R_conv_out_top},areas:{A_lat_in,A_lat_out,A_top_in,A_top_out},r_out};
+}
+
+// ---------- Layer UI ----------
+const layersList = el('layersList'); const addLayerBtn = el('addLayerBtn'); const presetBtn = el('presetBtn'); const clearLayers = el('clearLayers');
+function createLayer(name='Material', t=0.05, k=0.035){ const div = document.createElement('div'); div.className='layer'; div.innerHTML = `
+  <input class='lname' placeholder='name' value='${name}' title='material name'>
+  <input class='lth' type='number' step='0.001' placeholder='thickness (m)' value='${t}' title='thickness in m'>
+  <input class='lk' type='number' step='0.001' placeholder='k (W/m·K)' value='${k}' title='thermal conductivity'>
+  <button class='remove' title='remove layer'>✖</button>`; div.querySelector('.remove').addEventListener('click',()=>{ div.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-8px)'}],{duration:220}).onfinish=()=>div.remove(); }); layersList.appendChild(div); return div; }
+// defaults
+layersList.innerHTML=''; createLayer('EPS (example)',0.05,0.035);
+addLayerBtn.addEventListener('click',()=>createLayer('',0.05,0.035));
+clearLayers.addEventListener('click',()=>{ layersList.querySelectorAll('.layer').forEach(n=>n.remove()); });
+
+// presets modal
+const modal = el('modal'), presetGrid = el('presetGrid'), presetBtnEl = el('presetBtn'), closeModal = el('closeModal');
+const materialPresets = [ ['EPS',0.05,0.035], ['Mineral wool',0.05,0.04], ['Straw bale',0.10,0.06], ['Polyiso',0.05,0.023], ['Aerogel blanket',0.02,0.013] ];
+function openPresets(){ presetGrid.innerHTML=''; for(const p of materialPresets){ const b=document.createElement('button'); b.className='btn ghost'; b.style.display='block'; b.style.width='100%'; b.textContent = `${p[0]} — ${p[1]} m @ ${p[2]} W/m·K`; b.addEventListener('click',()=>{ createLayer(p[0],p[1],p[2]); }); presetGrid.appendChild(b); } modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
+presetBtnEl.addEventListener('click',openPresets); closeModal.addEventListener('click',()=>{ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); });
+
+// save/load presets (localStorage)
+el('savePreset').addEventListener('click',()=>{
+  const name = prompt('Preset name to save:'); if(!name) return; const layersArr = getLayers(); localStorage.setItem('bd_preset_'+name, JSON.stringify(layersArr)); alert('Saved preset '+name);
+});
+
+el('exportBtn').addEventListener('click',()=>{
+  const data = {inputs:readInputs(),layers:getLayers()}; const blob = new Blob([JSON.stringify(data, null, 2)],{type:'application/json'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='biodigester_design.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+el('importBtn').addEventListener('click',()=>el('importFile').click());
+el('importFile').addEventListener('change',async(e)=>{
+  const f = e.target.files[0]; if(!f) return; const text = await f.text(); try{ const obj = JSON.parse(text); if(obj.layers) { layersList.innerHTML=''; obj.layers.forEach(l=>createLayer(l.name||'',Number(l.t)||0,Number(l.k)||0)); alert('Imported layers'); } if(obj.inputs){ setInputs(obj.inputs); }
+  }catch(err){alert('Invalid JSON');}
+});
+
+function getLayers(){ const out=[]; document.querySelectorAll('#layersList .layer').forEach(row=>{ const name=row.querySelector('.lname').value||'mat'; const t=parseFloat(row.querySelector('.lth').value)||0; const k=parseFloat(row.querySelector('.lk').value)||0; if(t>0&&k>0) out.push({name,t,k}); }); return out; }
+
+// ---------- Inputs ----------
+function readInputs(){ return {
+  feedL: Number(el('dailyFeed').value), baseHRT: Number(el('baseHRT').value), T_amb: Number(el('ambientTemp').value), altitude: Number(el('altitude').value), ratio: Number(el('ratio').value), qgen: Number(el('qgen').value), Q10: Number(el('q10').value), h_in: Number(el('hin').value), h_out: Number(el('hout').value), layers:getLayers()
+}; }
+function setInputs(obj){ if(!obj) return; if('feedL' in obj) el('dailyFeed').value = obj.feedL; if('baseHRT' in obj) el('baseHRT').value = obj.baseHRT; if('T_amb' in obj) el('ambientTemp').value = obj.T_amb; if('altitude' in obj) el('altitude').value = obj.altitude; if('ratio' in obj) el('ratio').value = obj.ratio; if('qgen' in obj) el('qgen').value = obj.qgen; if('Q10' in obj) el('q10').value = obj.Q10; if('h_in' in obj) el('hin').value = obj.h_in; if('h_out' in obj) el('hout').value = obj.h_out; }
+
+// ---------- Popover behavior (accessibility friendly) ----------
+function setupPopovers(){ document.querySelectorAll('.popover').forEach(p=>{
+  const btn = p.querySelector('button'); const content = p.querySelector('.popover-content'); const targetId = p.getAttribute('data-target');
+  btn.addEventListener('click', (e)=>{ e.stopPropagation(); const open = p.classList.contains('open'); closeAllPopovers(); if(!open){ p.classList.add('open'); btn.setAttribute('aria-expanded','true'); content.setAttribute('aria-hidden','false'); // focus for keyboard
+      content.setAttribute('tabindex','-1'); content.focus(); }
+  });
+});
+  // close on outside click
+  document.addEventListener('click', ()=>{ closeAllPopovers(); });
+  // close on ESC
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeAllPopovers(); modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); } });
+}
+function closeAllPopovers(){ document.querySelectorAll('.popover.open').forEach(p=>{ p.classList.remove('open'); const btn=p.querySelector('button'); const content=p.querySelector('.popover-content'); if(btn) btn.setAttribute('aria-expanded','false'); if(content) content.setAttribute('aria-hidden','true'); }); }
+
+// ---------- Solver (pure) ----------
+function solveHRT(inputs, opts={}){
+  const dailyFeed_m3 = inputs.feedL/1000.0; const tref = CONFIG.tref; let adjustedHRT = inputs.baseHRT; let converged=false; let iter=0; let logs = [];
+  for(iter=0; iter<CONFIG.maxIter; iter++){
+    const Vslurry = dailyFeed_m3 * adjustedHRT; const d = cylinderDiameterFromVolume(Vslurry, inputs.ratio); const r0 = d/2; const L = inputs.ratio * d; const Robj = computeResistances(r0,L,inputs.layers,inputs.h_in,inputs.h_out); const Rtot = Robj.R_global; const Q_total = inputs.qgen * Vslurry; let T_int = inputs.T_amb + Q_total * Rtot; T_int = clamp(T_int, CONFIG.T_int_limit.min, CONFIG.T_int_limit.max);
+    let relRate = Math.pow(inputs.Q10, (T_int - tref)/10.0); if(!isFinite(relRate) || relRate<=0) relRate = CONFIG.TminRel; relRate = clamp(relRate, CONFIG.TminRel, CONFIG.TmaxRel);
+    const newHRT = inputs.baseHRT / relRate; const change = Math.abs(newHRT - adjustedHRT);
+    const alpha = clamp(0.5 + 0.45*(1 - Math.tanh(change)), CONFIG.alphaMin, CONFIG.alphaMax);
+    const nextHRT = alpha*newHRT + (1-alpha)*adjustedHRT;
+    logs.push({iter, adjustedHRT, newHRT, nextHRT, T_int, relRate});
+    if(Math.abs(nextHRT - adjustedHRT) < CONFIG.tol){ adjustedHRT = nextHRT; converged=true; break; }
+    adjustedHRT = nextHRT;
+  }
+  const V_final = dailyFeed_m3 * adjustedHRT; const d_final = cylinderDiameterFromVolume(V_final, inputs.ratio); const r_final = d_final/2; const L_final = inputs.ratio * d_final; const Rfinal = computeResistances(r_final,L_final,inputs.layers,inputs.h_in,inputs.h_out); const Q_final = inputs.qgen * V_final; const T_final = clamp(inputs.T_amb + Q_final*Rfinal.R_global, CONFIG.T_int_limit.min, CONFIG.T_int_limit.max);
+  const domeSea = hemisphereVolume(r_final); const P_local = pressureAtAltitude(inputs.altitude); const pressureFactor = 101.325 / (P_local || 101.325); const T_local_K = Math.max(273.15, T_final + 273.15); const domeAdjusted = domeSea * pressureFactor * (T_local_K / CONFIG.Tref_gas);
+  return {converged, iterations:logs.length||iter+1, adjustedHRT, V_final, d_final, L_final, T_final, Rfinal, domeSea, domeAdjusted, logs, P_local};
+}
+
+// ---------- UI: calculate / display ----------
+function setStatus(text, detail='') { el('status').textContent = text; el('statusDetail').textContent = detail; }
+function showResults(res){ el('outInfo').textContent = `Iterations: ${res.iterations}, P_local: ${res.P_local.toFixed(2)} kPa`;
+  animateValue('outHRT', 0, res.adjustedHRT, 'd', 2); animateValue('outVol', 0, res.V_final, 'm³', 3);
+  el('outDims').textContent = `${res.d_final.toFixed(3)} m × ${res.L_final.toFixed(3)} m`;
+  animateValue('outTint', 0, res.T_final, '°C', 2);
+  el('outR').textContent = `R_global: ${res.Rfinal.R_global.toFixed(4)} K/W  (lat:${res.Rfinal.R_lat.toFixed(4)} top:${res.Rfinal.R_top.toFixed(4)})`;
+  el('outDome').textContent = `${res.domeSea.toFixed(3)} m³ / ${res.domeAdjusted.toFixed(3)} m³`;
+}
+
+el('calcBtn').addEventListener('click', ()=>{
+  setStatus('Solving…','Running iterative solver');
+  closeAllPopovers();
+  const inputs = readInputs();
+  const numericFields = ['feedL','baseHRT','T_amb','altitude','qgen','Q10','h_in','h_out'];
+  for(const f of numericFields){ if(!isFinite(inputs[f]) || inputs[f]<=0){ alert('Please fill in all numeric fields with valid positive numbers.'); setStatus('Error','Invalid inputs'); return; } }
+  const layers = inputs.layers; if(layers.length===0){ if(!confirm('No insulation layers defined. Continue with zero insulation?')){ setStatus('Idle','Add layers'); return; } }
+  const t0 = performance.now(); const res = solveHRT(inputs); const t1 = performance.now(); showResults(res); setStatus(res.converged ? 'Converged' : 'Not converged', `in ${(t1-t0).toFixed(0)} ms`);
+});
+
+el('resetBtn').addEventListener('click',()=>{
+  document.getElementById('mainForm').reset(); layersList.innerHTML=''; createLayer('EPS (example)',0.05,0.035); ['outHRT','outVol','outDims','outTint','outR','outDome','outInfo'].forEach(id=>el(id).textContent='—'); setStatus('Idle','Ready');
+});
+
+// initialize UI and popovers
+setupPopovers();
+setTimeout(()=>{ el('dailyFeed').value = 1000; el('baseHRT').value = 30; el('ambientTemp').value = 5; el('altitude').value = 2500; },300);
+
+</script>
+</body>
+</html>
